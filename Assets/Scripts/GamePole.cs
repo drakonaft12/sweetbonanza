@@ -11,7 +11,8 @@ public class GamePole : MonoBehaviour
     [SerializeField] Sprite[] sprites;
     private List<Block>[] blocks;
 
-    bool isMove = false;
+    bool isMove = true;
+    bool TaskVork = true;
 
     private int[] typeBlocks;
     private void Awake()
@@ -27,6 +28,12 @@ public class GamePole : MonoBehaviour
     {
         Create();
         TaskUpdate();
+        FindUpdate();
+    }
+
+    private void OnDisable()
+    {
+        TaskVork=false;
     }
 
     public void Create()
@@ -49,7 +56,7 @@ public class GamePole : MonoBehaviour
         item.transform.SetParent(transform);
 
         blocks[x].Add(item.GetComponent<Block>());
-        item = spawner.Spawn(1, (Vector2)blocks[x][y].transform.position + Vector2.up * foot * y);
+        item = spawner.Spawn(1, (Vector2)blocks[x][y].transform.position + Vector2.up * foot * y+ Vector2.up * foot*size.y);
         item.transform.SetParent(transform);
         var fr = item.GetComponent<Fructs>();
         fr.Create(sprites[i], blocks[x][y].transform);
@@ -60,31 +67,36 @@ public class GamePole : MonoBehaviour
 
     private async void TaskUpdate()
     {
-        while (true)
+        while (TaskVork)
         {
             await Gravitation();
-            FindCombination();
+            
             await Task.Delay(10);
+        }
+    }
+
+    private async void FindUpdate()
+    {
+        while (TaskVork)
+        {
+             await FindCombination();
         }
     }
 
     private void Update()
     {
-        
-    }
-
-    private void FindCombination()
-    {
-        isMove = false;
         for (int x = 0; x < size.x; x++)
         {
-            for (int y = 0; y < size.y; y++)
+            if (blocks[x].Count < size.y)
             {
-                if (!isMove)
-                    isMove = blocks[x][y].Fruct.isMoving;
+                Spawn(x, (blocks[x].Count));
             }
         }
-        Debug.Log(isMove);
+    }
+
+    private async Task FindCombination()
+    {
+        await Task.Delay(1000);
         for (int i = 0; i < typeBlocks.Length; i++)
         {
             if (isMove)
@@ -101,45 +113,55 @@ public class GamePole : MonoBehaviour
                         if ((int)blocks[x][y].FrutBlock == i)
                         {
                             blocks[x][y].gameObject.SetActive(false);
-                            Gravitation();
                         }
                     }
                 }
 
             }
+            await Task.Delay(500);
 
         }
+        
     }
 
 
    
     private async Task Gravitation()
     {
-
+        isMove = false;
         for (int x = 0; x < size.x; x++)
         {
             for (int y = 0; y < size.y; y++)
+            {
+ 
+                if (!isMove)
+                    isMove = blocks[x][y].Fruct.isMoving;
+            }
+        }
+        for (int x = 0; x < size.x; x++)
+        {
+            for (int y = blocks[x].Count - 1; y >=0 ; y--)
             {
 
                 if (!blocks[x][y].gameObject.activeSelf)
                 {
                     typeBlocks[(int)blocks[x][y].FrutBlock]--;
-                    Spawn(x, (int)size.y);
                     blocks[x].Remove(blocks[x][y]);
                     UpdateLine(x, y);
                 }
-
             }
         }
 
-        await Task.Delay(10);
+
+        await Task.Delay(100);
     }
 
     private void UpdateLine(int x, int beginY)
     {
-        for (int y = beginY; y < size.y; y++)
+        for (int y = beginY; y < blocks[x].Count; y++)
         {
-            blocks[x][y].transform.position = transform.position + (Vector3)new Vector2(x * foot.x - (size.x - 1) * foot.x / 2, y * foot.y - (size.y - 1) * foot.y / 2);
+            blocks[x][y].transform.position = transform.position + 
+                (Vector3)new Vector2(x * foot.x - (size.x - 1) * foot.x / 2, y * foot.y - (size.y - 1) * foot.y / 2);
         }
     }
 
