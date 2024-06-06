@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class Block : MonoBehaviour
@@ -20,8 +21,4 @@ public class Block : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void OnDisable()
-    {
-        _fruct.gameObject.SetActive(false);
-    }
 }
