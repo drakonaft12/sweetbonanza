@@ -63,13 +63,14 @@ public class GamePole : MonoBehaviour
         while (true)
         {
             await Gravitation();
+            FindCombination();
             await Task.Delay(10);
         }
     }
 
     private void Update()
     {
-        FindCombination();
+        
     }
 
     private void FindCombination()
@@ -110,6 +111,8 @@ public class GamePole : MonoBehaviour
         }
     }
 
+
+   
     private async Task Gravitation()
     {
 
