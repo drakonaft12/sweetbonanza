@@ -96,16 +96,17 @@ public class GamePole : MonoBehaviour
 
     private async Task FindCombination()
     {
-        await Task.Delay(1000);
         for (int i = 0; i < typeBlocks.Length; i++)
         {
             if (isMove)
             {
+                await Task.Delay(100);
                 break;
             }
             if (typeBlocks[i] > 7)
             {
-                Debug.Log($"You find {(Fruts)i}");
+                FindCombination(i);
+                
                 for (int x = 0; x < size.x; x++)
                 {
                     for (int y = 0; y < size.y; y++)
@@ -124,8 +125,11 @@ public class GamePole : MonoBehaviour
         
     }
 
+    private void FindCombination(int i)
+    {
+        Debug.Log($"You find {(Fruts)i}");
+    }
 
-   
     private async Task Gravitation()
     {
         isMove = false;
