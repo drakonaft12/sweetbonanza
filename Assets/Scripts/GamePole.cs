@@ -13,6 +13,7 @@ public class GamePole : MonoBehaviour
 
     bool isMove = true;
     bool TaskVork = true;
+    bool VorkButton = true;
 
     private int[] typeBlocks;
     private void Awake()
@@ -107,7 +108,7 @@ public class GamePole : MonoBehaviour
             }
             if (typeBlocks[i] > 7)
             {
-
+                VorkButton = false;
                 FindCombination(i);
                 List<Vector2> cordinateCombination = new List<Vector2>();
 
@@ -135,6 +136,7 @@ public class GamePole : MonoBehaviour
                     }
                 }
             }
+            VorkButton = true;
             await Task.Delay(200);
 
 
@@ -225,6 +227,7 @@ public class GamePole : MonoBehaviour
 
     public void DeletePole()
     {
+        if(VorkButton)
         DeletePoleAsync();
     }
     public async void DeletePoleAsync()
