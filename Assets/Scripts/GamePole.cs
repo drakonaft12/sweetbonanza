@@ -27,6 +27,8 @@ public class GamePole : MonoBehaviour
     }
     private void Start()
     {
+        (transform as RectTransform).sizeDelta = new Vector2(size.x * foot.x, size.y * foot.y);
+
         Create();
         TaskUpdate();
         FindUpdate();
@@ -37,6 +39,15 @@ public class GamePole : MonoBehaviour
         TaskVork = false;
     }
 
+    private void OnEnable()
+    {
+        if (!TaskVork)
+        {
+            TaskVork = true;
+            TaskUpdate();
+            FindUpdate();
+        }
+    }
     public void Create()
     {
         TaskVork = true;
@@ -71,8 +82,6 @@ public class GamePole : MonoBehaviour
         while (TaskVork)
         {
             await Gravitation();
-
-            await Task.Delay(10);
         }
     }
 
@@ -191,7 +200,7 @@ public class GamePole : MonoBehaviour
         isMove = false;
         for (int x = 0; x < size.x; x++)
         {
-            for (int y = 0; y < size.y; y++)
+            for (int y = 0; y < blocks[x].Count; y++)
             {
 
                 if (!isMove)

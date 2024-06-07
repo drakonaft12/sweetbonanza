@@ -206,7 +206,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 433330073}
+      - m_Target: {fileID: 1796983102}
         m_TargetAssemblyTypeName: GamePole, Assembly-CSharp
         m_MethodName: DeletePole
         m_Mode: 1
@@ -384,7 +384,6 @@ GameObject:
   - component: {fileID: 433330072}
   - component: {fileID: 433330071}
   - component: {fileID: 433330070}
-  - component: {fileID: 433330073}
   m_Layer: 5
   m_Name: Game
   m_TagString: Untagged
@@ -405,6 +404,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 162598113}
+  - {fileID: 1796983099}
   m_Father: {fileID: 1687030336}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -475,25 +475,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!114 &433330073
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 433330068}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ff8e067875e26e489324472b67d3060, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  size: {x: 4, y: 4}
-  foot: {x: 180, y: 150}
-  spawner: {fileID: 1366073587}
-  sprites:
-  - {fileID: 21300000, guid: 5cdfbf26958e0ab4a97c972de9822ab6, type: 3}
-  - {fileID: 21300000, guid: 166660086d0cfb34bbecc519b4590dbf, type: 3}
-  - {fileID: 21300000, guid: 7de2883e340b94d46a12e0d87b00989b, type: 3}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -874,6 +855,85 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1080, y: 1920}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1796983098
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1796983099}
+  - component: {fileID: 1796983101}
+  - component: {fileID: 1796983102}
+  - component: {fileID: 1796983103}
+  m_Layer: 5
+  m_Name: Pole
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1796983099
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1796983098}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 433330069}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 800, y: 600}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &1796983101
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1796983098}
+  m_CullTransparentMesh: 1
+--- !u!114 &1796983102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1796983098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ff8e067875e26e489324472b67d3060, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: {x: 5, y: 4}
+  foot: {x: 180, y: 150}
+  spawner: {fileID: 1366073587}
+  sprites:
+  - {fileID: 21300000, guid: 5cdfbf26958e0ab4a97c972de9822ab6, type: 3}
+  - {fileID: 21300000, guid: 166660086d0cfb34bbecc519b4590dbf, type: 3}
+  - {fileID: 21300000, guid: 7de2883e340b94d46a12e0d87b00989b, type: 3}
+--- !u!114 &1796983103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1796983098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
 --- !u!1 &1872752431
 GameObject:
   m_ObjectHideFlags: 0
