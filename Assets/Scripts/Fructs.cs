@@ -62,7 +62,7 @@ public class Fructs : MonoBehaviour
     }
     public void Update()
     {
-        if (transform.position != _transform.position && isGoMove)
+        if (Vector3.Distance(transform.position , _transform.position)>15 && isGoMove)
         {
             transform.position += (_transform.position - transform.position).normalized * speed;
             _gameObjectImage.transform.position = transform.position;

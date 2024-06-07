@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -10,20 +9,30 @@ public class GamePole : MonoBehaviour
     [SerializeField] Spawner spawner;
     [SerializeField] Sprite[] sprites;
     private List<Block>[] blocks;
+    private List<Block> blocksFromDelete;
+    [SerializeField] private float stavka;
+    [SerializeField] private int _valueOfFreeResets;
+    [SerializeField] private float _valueOfPointCombination = 0;
+    [SerializeField] private float _valueOfPoint = 0;
+    [SerializeField] private float _Bank = 0;
+    private int _isReset;
+    private int _valueOfFruckType = 11;
 
     bool isMove = true;
     bool TaskVork = true;
     bool VorkButton = true;
+    bool StartSpawn = true;
 
     private int[] typeBlocks;
     private void Awake()
     {
-        typeBlocks = new int[3];
+        typeBlocks = new int[_valueOfFruckType];
         blocks = new List<Block>[(int)size.x];
         for (int i = 0; i < (int)size.x; i++)
         {
             blocks[i] = new List<Block>();
         }
+        blocksFromDelete = new List<Block>();
     }
     private void Start()
     {
@@ -62,17 +71,23 @@ public class GamePole : MonoBehaviour
 
     private void Spawn(int x, int y)
     {
-        int i = Random.Range(0, 3);
+        int i = Random.Range(0, 9);
+        float cost = (i + 1) * stavka;
+        if (Random.Range(0, 30) == 0) { i = 9; cost = 0; }
+        if (Random.Range(0, 50) == 0) { i = 10; cost = (Random.Range(1,3)+ Random.Range(1, 3)+ Random.Range(1, 3)+ Random.Range(1, 3)+ Random.Range(1, 3))*5; }
+
         var item = spawner.Spawn(0, (Vector2)transform.position);
-        item.transform.position += (Vector3)new Vector2(x * foot.x - (size.x - 1) * foot.x / 2, y * foot.y - (size.y - 1) * foot.y / 2);
+        item.transform.position += (Vector3)new Vector2(x * foot.x - (size.x - 1) * foot.x / 2,
+                                                        y * foot.y - (size.y - 1) * foot.y / 2);
         item.transform.SetParent(transform);
 
         blocks[x].Add(item.GetComponent<Block>());
-        item = spawner.Spawn(1, (Vector2)blocks[x][y].transform.position + Vector2.up * foot * y + Vector2.up * foot * size.y);
+        item = spawner.Spawn(1, (Vector2)blocks[x][y].transform.position + Vector2.up * foot * y/2 + Vector2.up * foot * size.y);
         item.transform.SetParent(transform);
         var fr = item.GetComponent<Fructs>();
         fr.Create(sprites[i], blocks[x][y].transform);
-        blocks[x][y].Create((Fruts)i, fr);
+
+        blocks[x][y].Create((Fruts)i, cost, fr);
         typeBlocks[i]++;
 
     }
@@ -90,76 +105,210 @@ public class GamePole : MonoBehaviour
         while (TaskVork)
         {
             await FindCombination();
+            if(_isReset<10)
+            _isReset++;
         }
     }
 
     private void Update()
     {
-        if (TaskVork)
+
+        if (TaskVork && StartSpawn)
+            for (int x = 0; x < size.x; x++)
+            {
+                if (blocks[x].Count < size.y)
+                {
+                    Spawn(x, (blocks[x].Count));
+                }
+            }
+        bool move = false;
+        isMove = true;
         for (int x = 0; x < size.x; x++)
         {
-            if (blocks[x].Count < size.y)
+            for (int y = 0; y < blocks[x].Count; y++)
             {
-                Spawn(x, (blocks[x].Count));
+
+                if (!move)
+                    move = blocks[x][y].Fruct.isMoving;
             }
+        }
+        isMove = move;
+        if (_valueOfFreeResets > 0 && _isReset > 4)
+        {
+            DeletePole();
+            _isReset = 0;
+            _valueOfFreeResets--;
+        }
+        if(_isReset > 3)
+        {
+            _Bank += _valueOfPoint;
+            _valueOfPoint = 0;
         }
     }
 
     private async Task FindCombination()
     {
-        for (int i = 0; i < typeBlocks.Length; i++)
+        for (int t = 0; t < 2; t++)
         {
-            await Task.Delay(100);
+            for (int i = 0; i < typeBlocks.Length; i++)
+            {
+                switch (i)
+                {
+                    case 9:
+                        await Comb4(i);
+                        break;
+                    case 10:
+                        await Bombs(i);
+                        break;
+                    default:
+                        await Comb8(i);
+                        break;
+                }
+
+                VorkButton = true;
+                await Task.Delay(10);
+            }
+        }
+        _valueOfPoint += _valueOfPointCombination;
+        _valueOfPointCombination = 0;
+        StartSpawn = true;
+    }
+
+    private async Task Comb8(int i)
+    {
+        if (typeBlocks[i] > 7)
+        {
+            _isReset = 0;
             if (isMove)
             {
-                await Task.Delay(100);
-                break;
+                await Task.Delay(10);
+                return;
             }
-            if (typeBlocks[i] > 7)
+            VorkButton = false;
+            FindCombination(i);
+            List<Vector2> cordinateCombination = new List<Vector2>();
+
+            for (int x = 0; x < size.x; x++)
             {
-                VorkButton = false;
-                FindCombination(i);
-                List<Vector2> cordinateCombination = new List<Vector2>();
-
-                for (int x = 0; x < size.x; x++)
+                for (int y = 0; y < blocks[x].Count; y++)
                 {
-                    for (int y = 0; y < blocks[x].Count; y++)
+                    if ((int)blocks[x][y].FrutBlock == i)
                     {
-                        if ((int)blocks[x][y].FrutBlock == i)
-                        {
-                            cordinateCombination.Add(new Vector2(x, y));
-                            StartCoroutine(blocks[x][y].Fruct.Destroy());
-                        }
-                    }
-                }
-                await Task.Delay(2000);
-                Debug.Log(AddPoints(cordinateCombination));
-                for (int x = 0; x < size.x; x++)
-                {
-                    for (int y = 0; y < blocks[x].Count; y++)
-                    {
-                        if ((int)blocks[x][y].FrutBlock == i)
-                        {
-                            blocks[x][y].gameObject.SetActive(false);
-                        }
+                        StartSpawn = false;
+                        cordinateCombination.Add(new Vector2(x, y));
+                        StartCoroutine(blocks[x][y].Fruct.Destroy());
+                        blocksFromDelete.Add(blocks[x][y]);
+                        typeBlocks[i]--;
                     }
                 }
             }
-            VorkButton = true;
-            await Task.Delay(200);
 
+            await Task.Delay(2000);
 
+            _valueOfPointCombination += AddPoints(cordinateCombination);
+            for (int x = 0; x < blocksFromDelete.Count; x++)
+            {
+                blocksFromDelete[x].gameObject.SetActive(false);
+                isMove = true;
+            }
+            blocksFromDelete.Clear();
+        }
+    }
+    private async Task Comb4(int i)
+    {
+        if (typeBlocks[i] > 3)
+        {
+            _isReset = 0;
+            if (isMove)
+            {
+                await Task.Delay(10);
+                return;
+            }
+            VorkButton = false;
+            FindCombination(i);
+            List<Vector2> cordinateCombination = new List<Vector2>();
+
+            for (int x = 0; x < size.x; x++)
+            {
+                for (int y = 0; y < blocks[x].Count; y++)
+                {
+                    if ((int)blocks[x][y].FrutBlock == i)
+                    {
+                        StartSpawn = false;
+                        cordinateCombination.Add(new Vector2(x, y));
+                        StartCoroutine(blocks[x][y].Fruct.Destroy());
+                        blocksFromDelete.Add(blocks[x][y]);
+                        typeBlocks[i]--;
+                    }
+                }
+            }
+
+            await Task.Delay(2000);
+
+            Debug.Log("Add 10 free resets");
+            _valueOfFreeResets += 10;
+            for (int x = 0; x < blocksFromDelete.Count; x++)
+            {
+                blocksFromDelete[x].gameObject.SetActive(false);
+                isMove = true;
+            }
+            blocksFromDelete.Clear();
         }
 
     }
 
-    private int AddPoints(List<Vector2> cordinateCombination)
+    private async Task Bombs(int i)
     {
-        int points = 0;
-        Vector2 r = new Vector2(-2, -2);
+        if (typeBlocks[i] > 0 && _valueOfPointCombination != 0)
+        {
+            _isReset = 0;
+            if (isMove)
+            {
+                await Task.Delay(10);
+                return;
+            }
+            VorkButton = false;
+            FindCombination(i);
+            List<Vector2> cordinateCombination = new List<Vector2>();
+
+            for (int x = 0; x < size.x; x++)
+            {
+                for (int y = 0; y < blocks[x].Count; y++)
+                {
+                    if ((int)blocks[x][y].FrutBlock == i)
+                    {
+                        StartSpawn = false;
+                        cordinateCombination.Add(new Vector2(x, y));
+                        StartCoroutine(blocks[x][y].Fruct.Destroy());
+                        blocksFromDelete.Add(blocks[x][y]);
+                        typeBlocks[i]--;
+                        await Task.Delay(500);
+                        _valueOfPointCombination *= blocks[x][y].Cost;
+                    }
+                }
+            }
+
+            await Task.Delay(2000);
+
+            
+            for (int x = 0; x < blocksFromDelete.Count; x++)
+            {
+                Debug.Log("Multipl: "+ blocksFromDelete[x].Cost);
+                blocksFromDelete[x].gameObject.SetActive(false);
+                isMove = true;
+            }
+            blocksFromDelete.Clear();
+        }
+
+    }
+
+    private float AddPoints(List<Vector2> cordinateCombination)
+    {
+        float points = 0;
+        //Vector2 r = new Vector2(-2, -2);
         for (int i = 0; i < cordinateCombination.Count; i++)
         {
-            for (int j = 0; j < i; j++)
+            /*for (int j = 0; j < i; j++)
             {
                 r = cordinateCombination[j];
                 points += 1;
@@ -182,7 +331,9 @@ public class GamePole : MonoBehaviour
                     points += 2;
                 }
 
-            }
+            }*/
+            points += blocks[(int)cordinateCombination[i].x][(int)cordinateCombination[i].y].Cost;
+
         }
         return points;
     }
@@ -195,17 +346,10 @@ public class GamePole : MonoBehaviour
 
     private async Task Gravitation()
     {
-        isMove = true;
-        await Task.Delay(10);
-        isMove = false;
-        for (int x = 0; x < size.x; x++)
+        if (!StartSpawn)
         {
-            for (int y = 0; y < blocks[x].Count; y++)
-            {
-
-                if (!isMove)
-                    isMove = blocks[x][y].Fruct.isMoving;
-            }
+            await Task.Delay(10);
+            return;
         }
         for (int x = 0; x < size.x; x++)
         {
@@ -214,7 +358,7 @@ public class GamePole : MonoBehaviour
 
                 if (!blocks[x][y].gameObject.activeSelf)
                 {
-                    typeBlocks[(int)blocks[x][y].FrutBlock]--;
+
                     blocks[x].Remove(blocks[x][y]);
                     UpdateLine(x, y);
                 }
@@ -236,12 +380,13 @@ public class GamePole : MonoBehaviour
 
     public void DeletePole()
     {
-        if(VorkButton)
-        DeletePoleAsync();
+        if (VorkButton)
+            DeletePoleAsync();
     }
     public async void DeletePoleAsync()
     {
         TaskVork = false;
+
         for (int x = 0; x < size.x; x++)
         {
             for (int y = blocks[x].Count - 1; y >= 0; y--)
@@ -255,7 +400,7 @@ public class GamePole : MonoBehaviour
             }
         }
         await Task.Delay(1000);
-        typeBlocks = new int[3];
+        typeBlocks = new int[_valueOfFruckType];
         Create();
         await Task.Delay(1000);
         TaskUpdate();
@@ -266,5 +411,13 @@ public enum Fruts : int
 {
     Арбуз = 0,
     Банан = 1,
-    Виноград = 2
+    Виноград = 2,
+    Слива = 3,
+    Яблоко = 4,
+    Зелёная = 5,
+    Синяя = 6,
+    Фиолетовая = 7,
+    Сердце = 8,
+    Леденец = 9,
+    Бомба = 10
 }
