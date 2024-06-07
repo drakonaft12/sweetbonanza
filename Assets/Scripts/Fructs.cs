@@ -28,7 +28,7 @@ public class Fructs : MonoBehaviour
         _transform = transform;
     }
 
-    public IEnumerator Destroy() 
+    public IEnumerator CombinationAnimationAndDisable() 
     {
         yield return MoveTo(transform.position + Vector3.up * 40+ Vector3.right*50, 0.5f);
         yield return MoveTo(transform.position + Vector3.up * 40 - Vector3.right * 50, 0.5f);

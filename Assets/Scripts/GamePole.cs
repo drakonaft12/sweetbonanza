@@ -212,7 +212,7 @@ public class GamePole : MonoBehaviour
                     {
                         StartSpawn = false;
                         cordinateCombination.Add(new Vector2(x, y));
-                        StartCoroutine(blocks[x][y].Fruct.Destroy());
+                        StartCoroutine(blocks[x][y].Fruct.CombinationAnimationAndDisable());
                         blocksFromDelete.Add(blocks[x][y]);
                         typeBlocks[i]--;
                     }
@@ -252,7 +252,7 @@ public class GamePole : MonoBehaviour
                     {
                         StartSpawn = false;
                         cordinateCombination.Add(new Vector2(x, y));
-                        StartCoroutine(blocks[x][y].Fruct.Destroy());
+                        StartCoroutine(blocks[x][y].Fruct.CombinationAnimationAndDisable());
                         blocksFromDelete.Add(blocks[x][y]);
                         typeBlocks[i]--;
                     }
@@ -295,7 +295,7 @@ public class GamePole : MonoBehaviour
                     {
                         StartSpawn = false;
                         cordinateCombination.Add(new Vector2(x, y));
-                        StartCoroutine(blocks[x][y].Fruct.Destroy());
+                        StartCoroutine(blocks[x][y].Fruct.CombinationAnimationAndDisable());
                         blocksFromDelete.Add(blocks[x][y]);
                         typeBlocks[i]--;
                         await Task.Delay(500);
