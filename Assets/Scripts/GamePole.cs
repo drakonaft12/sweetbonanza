@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class GamePole : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class GamePole : MonoBehaviour
     [SerializeField] private float _Bank = 0;
     private int _isReset;
     private int _valueOfFruckType = 11;
+    private int _otstup = 25;
 
     bool isMove = true;
     bool TaskVork = true;
@@ -37,7 +39,8 @@ public class GamePole : MonoBehaviour
     }
     private void Start()
     {
-        (transform as RectTransform).sizeDelta = new Vector2(size.x * foot.x, size.y * foot.y);
+        (transform as RectTransform).sizeDelta = new Vector2(size.x * foot.x, size.y * foot.y + _otstup);
+        transform.position += Vector3.up * _otstup;
 
         Create();
         TaskUpdate();
@@ -60,7 +63,7 @@ public class GamePole : MonoBehaviour
     }
     public async void Create()
     {
-        StartSpawn =false;
+        StartSpawn = false;
         TaskVork = true;
         for (int x = 0; x < size.x; x++)
         {
@@ -78,19 +81,22 @@ public class GamePole : MonoBehaviour
         int i = UnityEngine.Random.Range(0, 9);
         float cost = (i + 1) * stavka;
         if (UnityEngine.Random.Range(0, 30) == 0) { i = 9; cost = 0; }
-        if (UnityEngine.Random.Range(0, 50) == 0) { i = 10; cost = (UnityEngine.Random.Range(1, 3) + 
-                                                                    UnityEngine.Random.Range(1, 3) + 
-                                                                    UnityEngine.Random.Range(1, 3) + 
-                                                                    UnityEngine.Random.Range(1, 3) + 
-                                                                    UnityEngine.Random.Range(1, 3)) * 5; }
+        if (UnityEngine.Random.Range(0, 50) == 0)
+        {
+            i = 10; cost = (UnityEngine.Random.Range(1, 3) +
+                            UnityEngine.Random.Range(1, 3) +
+                            UnityEngine.Random.Range(1, 3) +
+                            UnityEngine.Random.Range(1, 3) +
+                            UnityEngine.Random.Range(1, 3)) * 5;
+        }
 
         var item = spawner.Spawn(0, (Vector2)transform.position);
         item.transform.position += (Vector3)new Vector2(x * foot.x - (size.x - 1) * foot.x / 2,
-                                                        y * foot.y - (size.y - 1) * foot.y / 2);
+                                                        y * foot.y - (size.y - 1) * foot.y / 2 - _otstup);
         item.transform.SetParent(transform);
 
         blocks[x].Add(item.GetComponent<Block>());
-        item = spawner.Spawn(1, (Vector2)blocks[x][y].transform.position + Vector2.up * foot * y / 2 + Vector2.up * foot * size.y);
+        item = spawner.Spawn(1, (Vector2)blocks[x][y].transform.position + Vector2.up * foot * (y / 2 + size.y));
         item.transform.SetParent(transform);
         var fr = item.GetComponent<Fructs>();
         fr.Create(sprites[i].sprite, blocks[x][y].transform, sprites[i].size);

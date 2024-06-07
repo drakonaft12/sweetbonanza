@@ -936,9 +936,9 @@ MonoBehaviour:
   - sprite: {fileID: 21300000, guid: f2b570d008b20f54db420a9c602f07e4, type: 3}
     size: {x: 1, y: 1}
   - sprite: {fileID: 21300000, guid: 581dab8ae7517684584769098f405ef0, type: 3}
-    size: {x: 1, y: 1.5}
+    size: {x: 1.2, y: 1.7}
   - sprite: {fileID: 21300000, guid: 722150bb2a3a063419f05110690febbd, type: 3}
-    size: {x: 1.2, y: 1.2}
+    size: {x: 1.7, y: 1.7}
   stavka: 1
   _valueOfFreeResets: 10
   _valueOfPointCombination: 0
