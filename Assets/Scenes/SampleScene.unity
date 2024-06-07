@@ -917,19 +917,31 @@ MonoBehaviour:
   foot: {x: 180, y: 150}
   spawner: {fileID: 1366073587}
   sprites:
-  - {fileID: 21300000, guid: 5cdfbf26958e0ab4a97c972de9822ab6, type: 3}
-  - {fileID: 21300000, guid: 166660086d0cfb34bbecc519b4590dbf, type: 3}
-  - {fileID: 21300000, guid: 7de2883e340b94d46a12e0d87b00989b, type: 3}
-  - {fileID: 21300000, guid: 8ad060d57a8c6f247be2d5993283cd06, type: 3}
-  - {fileID: 21300000, guid: 0e898f6247271e0438e6339129d3b2a5, type: 3}
-  - {fileID: 21300000, guid: f88880cecffcbbe4598093f15cf80150, type: 3}
-  - {fileID: 21300000, guid: 2c3d6ab05a823a146b9229c4fc1ccaff, type: 3}
-  - {fileID: 21300000, guid: c6e40e5246467aa4dbb8d71c23b8a6e6, type: 3}
-  - {fileID: 21300000, guid: f2b570d008b20f54db420a9c602f07e4, type: 3}
-  - {fileID: 21300000, guid: 581dab8ae7517684584769098f405ef0, type: 3}
-  - {fileID: 21300000, guid: 722150bb2a3a063419f05110690febbd, type: 3}
+  - sprite: {fileID: 21300000, guid: 5cdfbf26958e0ab4a97c972de9822ab6, type: 3}
+    size: {x: 1, y: 1}
+  - sprite: {fileID: 21300000, guid: 166660086d0cfb34bbecc519b4590dbf, type: 3}
+    size: {x: 1.5, y: 1}
+  - sprite: {fileID: 21300000, guid: 7de2883e340b94d46a12e0d87b00989b, type: 3}
+    size: {x: 1, y: 1}
+  - sprite: {fileID: 21300000, guid: 8ad060d57a8c6f247be2d5993283cd06, type: 3}
+    size: {x: 1, y: 1}
+  - sprite: {fileID: 21300000, guid: 0e898f6247271e0438e6339129d3b2a5, type: 3}
+    size: {x: 1, y: 1}
+  - sprite: {fileID: 21300000, guid: f88880cecffcbbe4598093f15cf80150, type: 3}
+    size: {x: 1, y: 1}
+  - sprite: {fileID: 21300000, guid: 2c3d6ab05a823a146b9229c4fc1ccaff, type: 3}
+    size: {x: 1, y: 1}
+  - sprite: {fileID: 21300000, guid: c6e40e5246467aa4dbb8d71c23b8a6e6, type: 3}
+    size: {x: 1, y: 1}
+  - sprite: {fileID: 21300000, guid: f2b570d008b20f54db420a9c602f07e4, type: 3}
+    size: {x: 1, y: 1}
+  - sprite: {fileID: 21300000, guid: 581dab8ae7517684584769098f405ef0, type: 3}
+    size: {x: 1, y: 1.5}
+  - sprite: {fileID: 21300000, guid: 722150bb2a3a063419f05110690febbd, type: 3}
+    size: {x: 1.2, y: 1.2}
   stavka: 1
   _valueOfFreeResets: 10
+  _valueOfPointCombination: 0
   _valueOfPoint: 0
   _Bank: 0
 --- !u!114 &1796983103

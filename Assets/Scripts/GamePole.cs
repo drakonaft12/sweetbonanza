@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -7,7 +8,7 @@ public class GamePole : MonoBehaviour
     [SerializeField] Vector2 size;
     [SerializeField] Vector2 foot = new Vector2(150, 150);
     [SerializeField] Spawner spawner;
-    [SerializeField] Sprite[] sprites;
+    [SerializeField] SpriteImage[] sprites;
     private List<Block>[] blocks;
     private List<Block> blocksFromDelete;
     [SerializeField] private float stavka;
@@ -57,8 +58,9 @@ public class GamePole : MonoBehaviour
             FindUpdate();
         }
     }
-    public void Create()
+    public async void Create()
     {
+        StartSpawn =false;
         TaskVork = true;
         for (int x = 0; x < size.x; x++)
         {
@@ -66,15 +68,21 @@ public class GamePole : MonoBehaviour
             {
                 Spawn(x, y);
             }
+            await Task.Delay(100);
         }
+        StartSpawn = true;
     }
 
     private void Spawn(int x, int y)
     {
-        int i = Random.Range(0, 9);
+        int i = UnityEngine.Random.Range(0, 9);
         float cost = (i + 1) * stavka;
-        if (Random.Range(0, 30) == 0) { i = 9; cost = 0; }
-        if (Random.Range(0, 50) == 0) { i = 10; cost = (Random.Range(1,3)+ Random.Range(1, 3)+ Random.Range(1, 3)+ Random.Range(1, 3)+ Random.Range(1, 3))*5; }
+        if (UnityEngine.Random.Range(0, 30) == 0) { i = 9; cost = 0; }
+        if (UnityEngine.Random.Range(0, 50) == 0) { i = 10; cost = (UnityEngine.Random.Range(1, 3) + 
+                                                                    UnityEngine.Random.Range(1, 3) + 
+                                                                    UnityEngine.Random.Range(1, 3) + 
+                                                                    UnityEngine.Random.Range(1, 3) + 
+                                                                    UnityEngine.Random.Range(1, 3)) * 5; }
 
         var item = spawner.Spawn(0, (Vector2)transform.position);
         item.transform.position += (Vector3)new Vector2(x * foot.x - (size.x - 1) * foot.x / 2,
@@ -82,10 +90,10 @@ public class GamePole : MonoBehaviour
         item.transform.SetParent(transform);
 
         blocks[x].Add(item.GetComponent<Block>());
-        item = spawner.Spawn(1, (Vector2)blocks[x][y].transform.position + Vector2.up * foot * y/2 + Vector2.up * foot * size.y);
+        item = spawner.Spawn(1, (Vector2)blocks[x][y].transform.position + Vector2.up * foot * y / 2 + Vector2.up * foot * size.y);
         item.transform.SetParent(transform);
         var fr = item.GetComponent<Fructs>();
-        fr.Create(sprites[i], blocks[x][y].transform);
+        fr.Create(sprites[i].sprite, blocks[x][y].transform, sprites[i].size);
 
         blocks[x][y].Create((Fruts)i, cost, fr);
         typeBlocks[i]++;
@@ -100,13 +108,21 @@ public class GamePole : MonoBehaviour
         }
     }
 
+    private async void SpawnUpdate()
+    {
+        while (TaskVork)
+        {
+            await Gravitation();
+        }
+    }
+
     private async void FindUpdate()
     {
         while (TaskVork)
         {
             await FindCombination();
-            if(_isReset<10)
-            _isReset++;
+            if (_isReset < 10)
+                _isReset++;
         }
     }
 
@@ -139,7 +155,7 @@ public class GamePole : MonoBehaviour
             _isReset = 0;
             _valueOfFreeResets--;
         }
-        if(_isReset > 3)
+        if (_isReset > 3)
         {
             _Bank += _valueOfPoint;
             _valueOfPoint = 0;
@@ -290,10 +306,10 @@ public class GamePole : MonoBehaviour
 
             await Task.Delay(2000);
 
-            
+
             for (int x = 0; x < blocksFromDelete.Count; x++)
             {
-                Debug.Log("Multipl: "+ blocksFromDelete[x].Cost);
+                Debug.Log("Multipl: " + blocksFromDelete[x].Cost);
                 blocksFromDelete[x].gameObject.SetActive(false);
                 isMove = true;
             }
@@ -398,8 +414,9 @@ public class GamePole : MonoBehaviour
                     blocks[x].Remove(blocks[x][y]);
                 }
             }
+            await Task.Delay(100);
         }
-        await Task.Delay(1000);
+        await Task.Delay(250);
         typeBlocks = new int[_valueOfFruckType];
         Create();
         await Task.Delay(1000);
@@ -420,4 +437,11 @@ public enum Fruts : int
     Сердце = 8,
     Леденец = 9,
     Бомба = 10
+}
+
+[Serializable]
+public class SpriteImage
+{
+    public Sprite sprite;
+    public Vector2 size;
 }
