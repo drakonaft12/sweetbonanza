@@ -12,7 +12,7 @@ public class Fructs : MonoBehaviour
     float speed = 30;
     bool isMove = false;
     bool isGoMove = true;
-
+    WaitForSeconds wait = new WaitForSeconds(0.045f);
 
     public Image Image => _image;
 
@@ -40,7 +40,7 @@ public class Fructs : MonoBehaviour
 
     public IEnumerator Reset()
     {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
         gameObject.SetActive(false);
     }
 
@@ -56,7 +56,7 @@ public class Fructs : MonoBehaviour
         {
             _gameObjectImage.transform.position += p;
 
-            yield return new WaitForSeconds(0.045f);
+            yield return wait;
         }
         _gameObjectImage.transform.position = point;
     }

@@ -254,7 +254,7 @@ public class GamePole : MonoBehaviour
                 }
             }
         }
-        await Task.Delay(2000);
+        await Task.Delay(1000);
         typeBlocks = new int[3];
         Create();
         await Task.Delay(1000);
