@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 
 public class GamePole : MonoBehaviour
@@ -16,6 +17,12 @@ public class GamePole : MonoBehaviour
     [SerializeField] private float _valueOfPointCombination = 0;
     [SerializeField] private float _valueOfPoint = 0;
     [SerializeField] private float _Bank = 0;
+
+    [SerializeField] private TextMeshProUGUI _stavTxt;
+    [SerializeField] private TextMeshProUGUI _frееspinTxt;
+    [SerializeField] private TextMeshProUGUI _comboTxt;
+    [SerializeField] private TextMeshProUGUI _pointTxt;
+    [SerializeField] private TextMeshProUGUI _bankTxt;
     private int _isReset;
     private int _valueOfFruckType = 11;
     private int _otstup = 25;
@@ -165,7 +172,19 @@ public class GamePole : MonoBehaviour
             _Bank += _valueOfPoint;
             _valueOfPoint = 0;
         }
+
+        UpdatеTеxt();
     }
+
+    private void UpdatеTеxt()
+    {
+        _stavTxt.text = stavka.ToString();
+        _pointTxt.text = _valueOfPoint.ToString();
+        _comboTxt.text = _valueOfPointCombination.ToString();
+        _bankTxt.text = _Bank.ToString();
+        _frееspinTxt.text = _valueOfFreeResets.ToString();
+    }
+
     /// <summary>
     /// Метод ищет возможные комбинации. Есть как специальные, так и общие.
     /// </summary>
