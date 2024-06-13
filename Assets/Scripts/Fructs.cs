@@ -28,6 +28,9 @@ public class Fructs : MonoBehaviour
         _transform = transform;
     }
 
+    /// <summary>
+    /// Анимация при подборе комбинации (можно вставить всё, что yгодно продолжительностью до 2 сек)
+    /// </summary>
     public IEnumerator CombinationAnimationAndDisable() 
     {
         yield return MoveTo(transform.position + Vector3.up * 40+ Vector3.right*50, 0.5f);
@@ -42,6 +45,9 @@ public class Fructs : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    /// <summary>
+    /// Анимация при падении fructs (только задержка)
+    /// </summary>
     public IEnumerator Reset()
     {
         yield return new WaitForSeconds(0.7f);
@@ -78,6 +84,9 @@ public class Fructs : MonoBehaviour
         }
         
     }
+    /// <summary>
+    /// Класс Fructs - это просто графическая часть, которая следyет за блоками. isMovе - единственное, что влияет на механникy
+    /// </summary>
     public void Update()
     {
         if (Vector3.Distance(transform.position , _transform.position)>20 && isGoMove)

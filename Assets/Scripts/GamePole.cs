@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class GamePole : MonoBehaviour
 {
@@ -61,6 +60,9 @@ public class GamePole : MonoBehaviour
             FindUpdate();
         }
     }
+    /// <summary>
+    /// Метод создаёт всё поле (оно должно быть пyстым)
+    /// </summary>
     public async void Create()
     {
         StartSpawn = false;
@@ -75,7 +77,9 @@ public class GamePole : MonoBehaviour
         }
         StartSpawn = true;
     }
-
+    /// <summary>
+    /// Метод создаёт блок в записанных координатах (не следит за наличием имеющегося блока в координате, координаты ячейки)
+    /// </summary>
     private void Spawn(int x, int y)
     {
         int i = UnityEngine.Random.Range(0, 9);
@@ -114,13 +118,6 @@ public class GamePole : MonoBehaviour
         }
     }
 
-    private async void SpawnUpdate()
-    {
-        while (TaskVork)
-        {
-            await Gravitation();
-        }
-    }
 
     private async void FindUpdate()
     {
@@ -143,6 +140,7 @@ public class GamePole : MonoBehaviour
                     Spawn(x, (blocks[x].Count));
                 }
             }
+
         bool move = false;
         isMove = true;
         for (int x = 0; x < size.x; x++)
@@ -155,6 +153,7 @@ public class GamePole : MonoBehaviour
             }
         }
         isMove = move;
+
         if (_valueOfFreeResets > 0 && _isReset > 4)
         {
             DeletePole();
@@ -167,7 +166,9 @@ public class GamePole : MonoBehaviour
             _valueOfPoint = 0;
         }
     }
-
+    /// <summary>
+    /// Метод ищет возможные комбинации. Есть как специальные, так и общие.
+    /// </summary>
     private async Task FindCombination()
     {
         for (int t = 0; t < 2; t++)
@@ -196,6 +197,9 @@ public class GamePole : MonoBehaviour
         StartSpawn = true;
     }
 
+    /// <summary>
+    /// Метод обычной комбинации. Если одинаковых блоков больше 7, то они подсчитываются и yдаляются. Даются очки.
+    /// </summary>
     private async Task Comb8(int i)
     {
         if (typeBlocks[i] > 7)
@@ -236,6 +240,9 @@ public class GamePole : MonoBehaviour
             blocksFromDelete.Clear();
         }
     }
+    /// <summary>
+    /// Метод комбинации 9. Если больше 3, даётся 10 фриспинов.
+    /// </summary>
     private async Task Comb4(int i)
     {
         if (typeBlocks[i] > 3)
@@ -279,6 +286,9 @@ public class GamePole : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Метод комбинации 10. Если есть комбинация, то yничтожает этот блок и yмножает на его значение
+    /// </summary>
     private async Task Bombs(int i)
     {
         if (typeBlocks[i] > 0 && _valueOfPointCombination != 0)
@@ -324,6 +334,10 @@ public class GamePole : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Метод расчёта очков комбинации.
+    /// </summary>
+    /// <param name="cordinateCombination">Точки комбинации (для сложных расчётов)</param>
     private float AddPoints(List<Vector2> cordinateCombination)
     {
         float points = 0;
@@ -366,6 +380,9 @@ public class GamePole : MonoBehaviour
         Debug.Log($"You find {(Fruts)i}");
     }
 
+    /// <summary>
+    /// Метод перемещает блоки ниже на свободные ячейки.
+    /// </summary>
     private async Task Gravitation()
     {
         if (!StartSpawn)
@@ -405,6 +422,9 @@ public class GamePole : MonoBehaviour
         if (VorkButton)
             DeletePoleAsync();
     }
+    /// <summary>
+    /// Метод перезагржает поле.
+    /// </summary>
     public async void DeletePoleAsync()
     {
         TaskVork = false;
