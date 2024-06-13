@@ -131,7 +131,7 @@ public class GamePole : MonoBehaviour
 
     private void Update()
     {
-
+        isMove = true;
         if (TaskVork && StartSpawn)
             for (int x = 0; x < size.x; x++)
             {
@@ -142,7 +142,7 @@ public class GamePole : MonoBehaviour
             }
 
         bool move = false;
-        isMove = true;
+        
         for (int x = 0; x < size.x; x++)
         {
             for (int y = 0; y < blocks[x].Count; y++)

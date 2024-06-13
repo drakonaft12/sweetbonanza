@@ -50,7 +50,7 @@ public class Fructs : MonoBehaviour
     /// </summary>
     public IEnumerator Reset()
     {
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSeconds(0.6f);
         gameObject.SetActive(false);
     }
 
