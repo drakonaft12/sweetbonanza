@@ -25,7 +25,7 @@ public class GamePole : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _bankTxt;
     private int _isReset;
     private int _valueOfFruckType = 11;
-    private int _otstup = 25;
+    private int _otstup = 25; //Отстyп сверхy
 
     bool isMove = true;
     bool TaskVork = true;
