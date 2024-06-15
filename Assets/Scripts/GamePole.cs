@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GamePole : MonoBehaviour
 {
@@ -16,25 +18,29 @@ public class GamePole : MonoBehaviour
     [SerializeField] private int _valueOfFreeResets;
     [SerializeField] private float _valueOfPointCombination = 0;
     [SerializeField] private float _valueOfPoint = 0;
-    [SerializeField] private float _Bank = 0;
+    [SerializeField] private float _Bank = 1000;
 
     [SerializeField] private TextMeshProUGUI _stavTxt;
-    [SerializeField] private TextMeshProUGUI _frееspinTxt;
+    [SerializeField] private TextMeshProUGUI _freespinTxt;
     [SerializeField] private TextMeshProUGUI _comboTxt;
     [SerializeField] private TextMeshProUGUI _pointTxt;
     [SerializeField] private TextMeshProUGUI _bankTxt;
+    [SerializeField] private Button _button;
+
     private int _isReset;
     private int _valueOfFruckType = 11;
-    private int _otstup = 25; //Отстyп сверхy
+    private int _otstup = 0; //РћС‚СЃС‚yРї СЃРІРµСЂС…y
 
     bool isMove = true;
     bool TaskVork = true;
     bool VorkButton = true;
+    bool WorkB = false;
     bool StartSpawn = true;
 
     private int[] typeBlocks;
     private void Awake()
     {
+        Application.targetFrameRate = 50;
         typeBlocks = new int[_valueOfFruckType];
         blocks = new List<Block>[(int)size.x];
         for (int i = 0; i < (int)size.x; i++)
@@ -43,12 +49,12 @@ public class GamePole : MonoBehaviour
         }
         blocksFromDelete = new List<Block>();
     }
-    private void Start()
+    private async void Start()
     {
         (transform as RectTransform).sizeDelta = new Vector2(size.x * foot.x, size.y * foot.y + _otstup);
         transform.position += Vector3.up * _otstup;
 
-        Create();
+        await Create();
         TaskUpdate();
         FindUpdate();
     }
@@ -58,22 +64,21 @@ public class GamePole : MonoBehaviour
         TaskVork = false;
     }
 
-    private void OnEnable()
-    {
-        if (!TaskVork)
-        {
-            TaskVork = true;
-            TaskUpdate();
-            FindUpdate();
-        }
-    }
+    // private void OnEnable()
+    // {
+    //     if (!TaskVork && StartSpawn)
+    //     {
+    //         TaskVork = true;
+    //         TaskUpdate();
+    //         FindUpdate();
+    //     }
+    // }
     /// <summary>
-    /// Метод создаёт всё поле (оно должно быть пyстым)
+    /// РњРµС‚РѕРґ СЃРѕР·РґР°С‘С‚ РІСЃС‘ РїРѕР»Рµ (РѕРЅРѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РїyСЃС‚С‹Рј)
     /// </summary>
-    public async void Create()
+    public async Task Create()
     {
         StartSpawn = false;
-        TaskVork = true;
         for (int x = 0; x < size.x; x++)
         {
             for (int y = 0; y < size.y; y++)
@@ -82,23 +87,20 @@ public class GamePole : MonoBehaviour
             }
             await Task.Delay(100);
         }
+        TaskVork = true;
         StartSpawn = true;
     }
     /// <summary>
-    /// Метод создаёт блок в записанных координатах (не следит за наличием имеющегося блока в координате, координаты ячейки)
+    /// РњРµС‚РѕРґ СЃРѕР·РґР°С‘С‚ Р±Р»РѕРє РІ Р·Р°РїРёСЃР°РЅРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚Р°С… (РЅРµ СЃР»РµРґРёС‚ Р·Р° РЅР°Р»РёС‡РёРµРј РёРјРµСЋС‰РµРіРѕСЃСЏ Р±Р»РѕРєР° РІ РєРѕРѕСЂРґРёРЅР°С‚Рµ, РєРѕРѕСЂРґРёРЅР°С‚С‹ СЏС‡РµР№РєРё)
     /// </summary>
     private void Spawn(int x, int y)
     {
-        int i = UnityEngine.Random.Range(0, 9);
+        int i = UnityEngine.Random.Range(0, 5);
         float cost = (i + 1) * stavka;
-        if (UnityEngine.Random.Range(0, 30) == 0) { i = 9; cost = 0; }
+        if (UnityEngine.Random.Range(0, 30) == 0) { i = 5; cost = 0; }
         if (UnityEngine.Random.Range(0, 50) == 0)
         {
-            i = 10; cost = (UnityEngine.Random.Range(1, 3) +
-                            UnityEngine.Random.Range(1, 3) +
-                            UnityEngine.Random.Range(1, 3) +
-                            UnityEngine.Random.Range(1, 3) +
-                            UnityEngine.Random.Range(1, 3)) * 5;
+            i = 10; cost = (UnityEngine.Random.Range(1, 3)) * 5;
         }
 
         var item = spawner.Spawn(0, (Vector2)transform.position);
@@ -130,6 +132,11 @@ public class GamePole : MonoBehaviour
     {
         while (TaskVork)
         {
+            if (isMove)
+            {
+                await Task.Delay(100);
+
+            }
             await FindCombination();
             if (_isReset < 10)
                 _isReset++;
@@ -149,7 +156,7 @@ public class GamePole : MonoBehaviour
             }
 
         bool move = false;
-        
+
         for (int x = 0; x < size.x; x++)
         {
             for (int y = 0; y < blocks[x].Count; y++)
@@ -160,7 +167,8 @@ public class GamePole : MonoBehaviour
             }
         }
         isMove = move;
-
+        _button.interactable = _valueOfFreeResets == 0 && !isMove && _isReset > 4;
+        WorkB = _valueOfFreeResets == 0 && !isMove && _isReset > 4;
         if (_valueOfFreeResets > 0 && _isReset > 4)
         {
             DeletePole();
@@ -173,20 +181,20 @@ public class GamePole : MonoBehaviour
             _valueOfPoint = 0;
         }
 
-        UpdatеTеxt();
+        UpdateText();
     }
 
-    private void UpdatеTеxt()
+    private void UpdateText()
     {
-        _stavTxt.text = stavka.ToString();
-        _pointTxt.text = _valueOfPoint.ToString();
+        _stavTxt.text = $"<color=orange>BET</color> ${stavka}";
+        _pointTxt.text = $"<color=orange>WIN</color> ${_valueOfPoint}";
         _comboTxt.text = _valueOfPointCombination.ToString();
-        _bankTxt.text = _Bank.ToString();
-        _frееspinTxt.text = _valueOfFreeResets.ToString();
+        _bankTxt.text = $"<color=orange>CREDIT</color> ${_Bank}";
+        _freespinTxt.text = _valueOfFreeResets.ToString();
     }
 
     /// <summary>
-    /// Метод ищет возможные комбинации. Есть как специальные, так и общие.
+    /// РњРµС‚РѕРґ РёС‰РµС‚ РІРѕР·РјРѕР¶РЅС‹Рµ РєРѕРјР±РёРЅР°С†РёРё. Р•СЃС‚СЊ РєР°Рє СЃРїРµС†РёР°Р»СЊРЅС‹Рµ, С‚Р°Рє Рё РѕР±С‰РёРµ.
     /// </summary>
     private async Task FindCombination()
     {
@@ -217,7 +225,7 @@ public class GamePole : MonoBehaviour
     }
 
     /// <summary>
-    /// Метод обычной комбинации. Если одинаковых блоков больше 7, то они подсчитываются и yдаляются. Даются очки.
+    /// РњРµС‚РѕРґ РѕР±С‹С‡РЅРѕР№ РєРѕРјР±РёРЅР°С†РёРё. Р•СЃР»Рё РѕРґРёРЅР°РєРѕРІС‹С… Р±Р»РѕРєРѕРІ Р±РѕР»СЊС€Рµ 7, С‚Рѕ РѕРЅРё РїРѕРґСЃС‡РёС‚С‹РІР°СЋС‚СЃСЏ Рё yРґР°Р»СЏСЋС‚СЃСЏ. Р”Р°СЋС‚СЃСЏ РѕС‡РєРё.
     /// </summary>
     private async Task Comb8(int i)
     {
@@ -241,16 +249,16 @@ public class GamePole : MonoBehaviour
                     {
                         StartSpawn = false;
                         cordinateCombination.Add(new Vector2(x, y));
-                        StartCoroutine(blocks[x][y].Fruct.CombinationAnimationAndDisable());
+                        StartCoroutine(blocks[x][y].Fruct.CombinationAnimationAndDisable(blocks[x][y].FrutBlock == Fruts.Р‘РѕРјР±Р°));
                         blocksFromDelete.Add(blocks[x][y]);
                         typeBlocks[i]--;
                     }
                 }
             }
 
-            await Task.Delay(2000);
-
             _valueOfPointCombination += AddPoints(cordinateCombination);
+            await Task.Delay(1500);
+
             for (int x = 0; x < blocksFromDelete.Count; x++)
             {
                 blocksFromDelete[x].gameObject.SetActive(false);
@@ -260,11 +268,11 @@ public class GamePole : MonoBehaviour
         }
     }
     /// <summary>
-    /// Метод комбинации 9. Если больше 3, даётся 10 фриспинов.
+    /// РњРµС‚РѕРґ РєРѕРјР±РёРЅР°С†РёРё 9. Р•СЃР»Рё Р±РѕР»СЊС€Рµ 3, РґР°С‘С‚СЃСЏ 10 С„СЂРёСЃРїРёРЅРѕРІ.
     /// </summary>
     private async Task Comb4(int i)
     {
-        if (typeBlocks[i] > 3)
+        if (typeBlocks[i] > 9)
         {
             _isReset = 0;
             if (isMove)
@@ -284,17 +292,17 @@ public class GamePole : MonoBehaviour
                     {
                         StartSpawn = false;
                         cordinateCombination.Add(new Vector2(x, y));
-                        StartCoroutine(blocks[x][y].Fruct.CombinationAnimationAndDisable());
+                        StartCoroutine(blocks[x][y].Fruct.CombinationAnimationAndDisable(blocks[x][y].FrutBlock == Fruts.Р‘РѕРјР±Р°));
                         blocksFromDelete.Add(blocks[x][y]);
                         typeBlocks[i]--;
                     }
                 }
             }
 
-            await Task.Delay(2000);
-
+            await Task.Delay(1750);
             Debug.Log("Add 10 free resets");
             _valueOfFreeResets += 10;
+
             for (int x = 0; x < blocksFromDelete.Count; x++)
             {
                 blocksFromDelete[x].gameObject.SetActive(false);
@@ -306,7 +314,7 @@ public class GamePole : MonoBehaviour
     }
 
     /// <summary>
-    /// Метод комбинации 10. Если есть комбинация, то yничтожает этот блок и yмножает на его значение
+    /// РњРµС‚РѕРґ РєРѕРјР±РёРЅР°С†РёРё 10. Р•СЃР»Рё РµСЃС‚СЊ РєРѕРјР±РёРЅР°С†РёСЏ, С‚Рѕ yРЅРёС‡С‚РѕР¶Р°РµС‚ СЌС‚РѕС‚ Р±Р»РѕРє Рё yРјРЅРѕР¶Р°РµС‚ РЅР° РµРіРѕ Р·РЅР°С‡РµРЅРёРµ
     /// </summary>
     private async Task Bombs(int i)
     {
@@ -330,16 +338,16 @@ public class GamePole : MonoBehaviour
                     {
                         StartSpawn = false;
                         cordinateCombination.Add(new Vector2(x, y));
-                        StartCoroutine(blocks[x][y].Fruct.CombinationAnimationAndDisable());
+                        StartCoroutine(blocks[x][y].Fruct.CombinationAnimationAndDisable(blocks[x][y].FrutBlock == Fruts.Р‘РѕРјР±Р°));
+                        _valueOfPointCombination *= blocks[x][y].Cost;
                         blocksFromDelete.Add(blocks[x][y]);
                         typeBlocks[i]--;
                         await Task.Delay(500);
-                        _valueOfPointCombination *= blocks[x][y].Cost;
                     }
                 }
             }
 
-            await Task.Delay(2000);
+            await Task.Delay(300);
 
 
             for (int x = 0; x < blocksFromDelete.Count; x++)
@@ -354,9 +362,9 @@ public class GamePole : MonoBehaviour
     }
 
     /// <summary>
-    /// Метод расчёта очков комбинации.
+    /// РњРµС‚РѕРґ СЂР°СЃС‡С‘С‚Р° РѕС‡РєРѕРІ РєРѕРјР±РёРЅР°С†РёРё.
     /// </summary>
-    /// <param name="cordinateCombination">Точки комбинации (для сложных расчётов)</param>
+    /// <param name="cordinateCombination">РўРѕС‡РєРё РєРѕРјР±РёРЅР°С†РёРё (РґР»СЏ СЃР»РѕР¶РЅС‹С… СЂР°СЃС‡С‘С‚РѕРІ)</param>
     private float AddPoints(List<Vector2> cordinateCombination)
     {
         float points = 0;
@@ -387,7 +395,7 @@ public class GamePole : MonoBehaviour
                 }
 
             }*/
-            points += blocks[(int)cordinateCombination[i].x][(int)cordinateCombination[i].y].Cost;
+            points += blocks[(int)cordinateCombination[i].x][(int)cordinateCombination[i].y].Cost * (stavka / 100);
 
         }
         return points;
@@ -400,7 +408,7 @@ public class GamePole : MonoBehaviour
     }
 
     /// <summary>
-    /// Метод перемещает блоки ниже на свободные ячейки.
+    /// РњРµС‚РѕРґ РїРµСЂРµРјРµС‰Р°РµС‚ Р±Р»РѕРєРё РЅРёР¶Рµ РЅР° СЃРІРѕР±РѕРґРЅС‹Рµ СЏС‡РµР№РєРё.
     /// </summary>
     private async Task Gravitation()
     {
@@ -436,17 +444,52 @@ public class GamePole : MonoBehaviour
         }
     }
 
+    public void AddBet()
+    {
+        if (stavka * 2.5f > _Bank - 1)
+            return;
+
+        stavka *= 2.5f;
+    }
+
+    public void RemoveBet()
+    {
+        if (stavka / 2.5f < 10)
+            stavka = 2.5f;
+        else
+            stavka /= 2.5f;
+    }
+
+    public void DeletePoleButton()
+    {
+        if(_Bank - stavka <= 0)
+        {
+            Debug.Log("Nt enugh mney");
+            return;
+        }
+
+        _Bank -= stavka;
+
+        if (WorkB && VorkButton)
+        {
+            _isReset = 0;
+            WorkB = false;
+            DeletePole();
+        }
+    }
     public void DeletePole()
     {
         if (VorkButton)
             DeletePoleAsync();
+        VorkButton = false;
     }
     /// <summary>
-    /// Метод перезагржает поле.
+    /// РњРµС‚РѕРґ РїРµСЂРµР·Р°РіСЂР¶Р°РµС‚ РїРѕР»Рµ.
     /// </summary>
     public async void DeletePoleAsync()
     {
         TaskVork = false;
+        StartSpawn = false;
 
         for (int x = 0; x < size.x; x++)
         {
@@ -463,7 +506,8 @@ public class GamePole : MonoBehaviour
         }
         await Task.Delay(250);
         typeBlocks = new int[_valueOfFruckType];
-        Create();
+        TaskVork = false;
+        await Create();
         await Task.Delay(1000);
         TaskUpdate();
         FindUpdate();
@@ -471,17 +515,17 @@ public class GamePole : MonoBehaviour
 }
 public enum Fruts : int
 {
-    Арбуз = 0,
-    Банан = 1,
-    Виноград = 2,
-    Слива = 3,
-    Яблоко = 4,
-    Зелёная = 5,
-    Синяя = 6,
-    Фиолетовая = 7,
-    Сердце = 8,
-    Леденец = 9,
-    Бомба = 10
+    РђСЂР±СѓР· = 0,
+    Р‘Р°РЅР°РЅ = 1,
+    Р’РёРЅРѕРіСЂР°Рґ = 2,
+    РЎР»РёРІР° = 3,
+    РЇР±Р»РѕРєРѕ = 4,
+    Р—РµР»С‘РЅР°СЏ = 5,
+    РЎРёРЅСЏСЏ = 6,
+    Р¤РёРѕР»РµС‚РѕРІР°СЏ = 7,
+    РЎРµСЂРґС†Рµ = 8,
+    Р›РµРґРµРЅРµС† = 9,
+    Р‘РѕРјР±Р° = 10
 }
 
 [Serializable]

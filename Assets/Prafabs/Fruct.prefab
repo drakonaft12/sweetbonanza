@@ -133,4 +133,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64dff67cd6f258243aa33e39066c1b2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gameObjectImage: {fileID: 5010560275349900134}
+  _gameObjectImage: {fileID: 4975959549318629939}
