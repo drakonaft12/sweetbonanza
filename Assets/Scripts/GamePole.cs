@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class GamePole : MonoBehaviour
 {
     [SerializeField] Vector2 size;
+    [SerializeField] float globalSizePole = 1;
+    [SerializeField] float globalSizeFructs = 1;
     [SerializeField] Vector2 foot = new Vector2(150, 150);
     [SerializeField] Spawner spawner;
     [SerializeField] SpriteImage[] sprites;
@@ -26,10 +29,12 @@ public class GamePole : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _pointTxt;
     [SerializeField] private TextMeshProUGUI _bankTxt;
     [SerializeField] private Button _button;
+    [SerializeField] private Canvas _canvas;
 
     private int _isReset;
     private int _valueOfFruckType = 11;
     private int _otstup = 0; //Отстyп сверхy
+    Vector2 deltaSize;
 
     bool isMove = true;
     bool TaskVork = true;
@@ -48,11 +53,18 @@ public class GamePole : MonoBehaviour
             blocks[i] = new List<Block>();
         }
         blocksFromDelete = new List<Block>();
+        foot *= globalSizePole;
+        deltaSize = (_canvas.transform as RectTransform).sizeDelta;
+
     }
     private async void Start()
     {
         (transform as RectTransform).sizeDelta = new Vector2(size.x * foot.x, size.y * foot.y + _otstup);
         transform.position += Vector3.up * _otstup;
+
+        foot.y *= Screen.width / deltaSize.x;
+        foot.x *= Screen.height / deltaSize.y;
+
 
         await Create();
         TaskUpdate();
@@ -112,7 +124,9 @@ public class GamePole : MonoBehaviour
         item = spawner.Spawn(1, (Vector2)blocks[x][y].transform.position + Vector2.up * foot * (y / 2 + size.y));
         item.transform.SetParent(transform);
         var fr = item.GetComponent<Fructs>();
-        fr.Create(sprites[i].sprite, blocks[x][y].transform, sprites[i].size);
+        var spritSiz = sprites[i].size;
+        spritSiz *= Screen.width / deltaSize.x;
+        fr.Create(sprites[i].sprite, blocks[x][y].transform, spritSiz * globalSizeFructs);
 
         blocks[x][y].Create((Fruts)i, cost, fr);
         typeBlocks[i]++;
@@ -462,7 +476,7 @@ public class GamePole : MonoBehaviour
 
     public void DeletePoleButton()
     {
-        if(_Bank - stavka <= 0)
+        if (_Bank - stavka <= 0)
         {
             Debug.Log("Nt enugh mney");
             return;
@@ -497,7 +511,7 @@ public class GamePole : MonoBehaviour
             {
                 {
                     StartCoroutine(blocks[x][y].Fruct.Reset());
-                    blocks[x][y].gameObject.transform.position += Vector3.down * 1000;
+                    blocks[x][y].gameObject.transform.position += Vector3.down * 1000 * deltaSize.y;
                     blocks[x][y].gameObject.SetActive(false);
                     blocks[x].Remove(blocks[x][y]);
                 }

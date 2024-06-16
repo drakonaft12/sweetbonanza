@@ -9,7 +9,8 @@ public class Fructs : MonoBehaviour
     Image _image;
     Transform _transform;
     [SerializeField] Image _gameObjectImage;
-    float speed = 40;
+    float speed = 1400;
+    float deltaSpeed;
     bool isMove = false;
     bool isGoMove = true;
     WaitForSeconds wait = new WaitForSeconds(0.045f);
@@ -23,7 +24,7 @@ public class Fructs : MonoBehaviour
     private void Awake()
     {
         _image = _gameObjectImage.GetComponent<Image>();
-
+        deltaSpeed = Screen.width / 1920f;
     }
 
     public void Create(Sprite sprite, Transform transform, Vector2 size)
@@ -81,6 +82,11 @@ public class Fructs : MonoBehaviour
         canAnimate = true;
     }
 
+    private void OnEnable()
+    {
+        _gameObjectImage.transform.localScale = Vector3.one + Vector3.up * 0.2f;
+    }
+
     private IEnumerator RotateAndScaleTo(float angle, Vector2 scale, float delay)
     {
         for (int i = 0; i < delay * 16; i++)
@@ -111,9 +117,9 @@ public class Fructs : MonoBehaviour
     /// </summary>
     public void Update()
     {
-        if (Vector3.Distance(transform.position, _transform.position) > 20 && isGoMove)
+        if (Vector3.Distance(transform.position, _transform.position) > 20 * deltaSpeed && isGoMove)
         {
-            transform.position += (_transform.position - transform.position).normalized * speed;
+            transform.position += (_transform.position - transform.position).normalized * speed * deltaSpeed * Time.deltaTime;
             _gameObjectImage.transform.position = transform.position;
             isMove = true;
         }
@@ -121,6 +127,7 @@ public class Fructs : MonoBehaviour
         {
             isMove = false;
             EndGraviAnimation();
+            transform.position = _transform.position;
         }
     }
 
@@ -132,7 +139,7 @@ public class Fructs : MonoBehaviour
         canAnimate = false;
         await Task.Delay(10);
 
-        await transform.DOScaleY(1.5f, 0.2f).SetEase(Ease.Flash).AsyncWaitForCompletion();
-        transform.DOScaleY(1f, 0.2f);
+        await _gameObjectImage.transform.DOScaleY(0.7f, 0.2f).SetEase(Ease.Flash).AsyncWaitForCompletion();
+        _gameObjectImage.transform.DOScaleY(1f, 0.2f);
     }
 }
