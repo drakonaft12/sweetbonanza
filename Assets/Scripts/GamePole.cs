@@ -41,6 +41,8 @@ public class GamePole : MonoBehaviour
     bool VorkButton = true;
     bool WorkB = false;
     bool StartSpawn = true;
+    bool StartGrav = false;
+    bool UpdatGrav = true;
 
     private int[] typeBlocks;
     private void Awake()
@@ -99,6 +101,7 @@ public class GamePole : MonoBehaviour
             }
             await Task.Delay(100);
         }
+        StartGrav = false;
         TaskVork = true;
         StartSpawn = true;
     }
@@ -137,7 +140,12 @@ public class GamePole : MonoBehaviour
     {
         while (TaskVork)
         {
-            await Gravitation();
+            if (UpdatGrav)
+            {
+                await Gravitation();
+            }
+            else
+                await Task.Delay(100);
         }
     }
 
@@ -146,13 +154,8 @@ public class GamePole : MonoBehaviour
     {
         while (TaskVork)
         {
-            if (isMove)
-            {
-                await Task.Delay(100);
-
-            }
             await FindCombination();
-            if (_isReset < 10)
+            if (!StartGrav && _isReset < 10)
                 _isReset++;
         }
     }
@@ -168,7 +171,7 @@ public class GamePole : MonoBehaviour
                     Spawn(x, (blocks[x].Count));
                 }
             }
-
+        
         bool move = false;
 
         for (int x = 0; x < size.x; x++)
@@ -183,6 +186,7 @@ public class GamePole : MonoBehaviour
         isMove = move;
         _button.interactable = _valueOfFreeResets == 0 && !isMove && _isReset > 4;
         WorkB = _valueOfFreeResets == 0 && !isMove && _isReset > 4;
+        UpdatGrav = _isReset > 0;
         if (_valueOfFreeResets > 0 && _isReset > 4)
         {
             DeletePole();
@@ -216,8 +220,15 @@ public class GamePole : MonoBehaviour
         {
             for (int i = 0; i < typeBlocks.Length; i++)
             {
+                if (StartGrav)
+                {
+                    await Task.Delay(100);
+                    _isReset = 0;
+                    return;
+                }
                 switch (i)
                 {
+
                     case 9:
                         await Comb4(i);
                         break;
@@ -229,7 +240,7 @@ public class GamePole : MonoBehaviour
                         await Comb8(i);
                         break;
                 }
-
+                isMove = true;
                 VorkButton = true;
                 await Task.Delay(10);
             }
@@ -246,6 +257,7 @@ public class GamePole : MonoBehaviour
     {
         if (typeBlocks[i] > 7)
         {
+            UpdatGrav = false;
             _isReset = 0;
             if (isMove)
             {
@@ -289,6 +301,7 @@ public class GamePole : MonoBehaviour
     {
         if (typeBlocks[i] > 3)
         {
+            UpdatGrav = false;
             _isReset = 0;
             if (isMove)
             {
@@ -335,6 +348,7 @@ public class GamePole : MonoBehaviour
     {
         if (typeBlocks[i] > 0 && _valueOfPointCombination != 0)
         {
+            UpdatGrav = false;
             _isReset = 0;
             if (isMove)
             {
@@ -427,20 +441,15 @@ public class GamePole : MonoBehaviour
     /// </summary>
     private async Task Gravitation()
     {
-        if (!StartSpawn)
-        {
-            await Task.Delay(10);
-            return;
-        }
+        
         for (int x = 0; x < size.x; x++)
         {
             for (int y = blocks[x].Count - 1; y >= 0; y--)
             {
-                isMove = true;
 
                 if (!blocks[x][y].gameObject.activeSelf)
                 {
-
+                    StartGrav = true;
                     blocks[x].Remove(blocks[x][y]);
                     UpdateLine(x, y);
                 }
@@ -449,12 +458,14 @@ public class GamePole : MonoBehaviour
 
 
         await Task.Delay(100);
+        StartGrav =false;
     }
 
     private void UpdateLine(int x, int beginY)
     {
         for (int y = beginY; y < blocks[x].Count; y++)
         {
+            isMove = true;
             blocks[x][y].transform.position = transform.position +
                 (Vector3)new Vector2(x * foot.x - (size.x - 1) * foot.x / 2, y * foot.y - (size.y - 1) * foot.y / 2);
         }

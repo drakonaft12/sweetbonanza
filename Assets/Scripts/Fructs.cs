@@ -11,7 +11,7 @@ public class Fructs : MonoBehaviour
     [SerializeField] Image _gameObjectImage;
     float speed = 1400;
     float deltaSpeed;
-    bool isMove = false;
+    bool isMove = true;
     bool isGoMove = true;
     WaitForSeconds wait = new WaitForSeconds(0.045f);
 
@@ -122,12 +122,13 @@ public class Fructs : MonoBehaviour
             transform.position += (_transform.position - transform.position).normalized * speed * deltaSpeed * Time.deltaTime;
             _gameObjectImage.transform.position = transform.position;
             isMove = true;
+            canAnimate = true;
         }
         else
         {
-            isMove = false;
             EndGraviAnimation();
             transform.position = _transform.position;
+            isMove = false;
         }
     }
 
