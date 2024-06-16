@@ -108,11 +108,11 @@ public class GamePole : MonoBehaviour
     private void Spawn(int x, int y)
     {
         int i = UnityEngine.Random.Range(0, 5);
-        float cost = (i + 1) * stavka;
-        if (UnityEngine.Random.Range(0, 30) == 0) { i = 5; cost = 0; }
-        if (UnityEngine.Random.Range(0, 50) == 0)
+        float cost = (i + 1) * stavka * 0.25f;
+        if (UnityEngine.Random.Range(0, 30) == 0) { i = 9; cost = 0; }
+        if (UnityEngine.Random.Range(0, 90) == 0)
         {
-            i = 10; cost = (UnityEngine.Random.Range(1, 3)) * 5;
+            i = 10; cost = (UnityEngine.Random.Range(1, 6)) * 1.25f;
         }
 
         var item = spawner.Spawn(0, (Vector2)transform.position);
@@ -222,7 +222,8 @@ public class GamePole : MonoBehaviour
                         await Comb4(i);
                         break;
                     case 10:
-                        await Bombs(i);
+                        if (t == 1)
+                            await Bombs(i);
                         break;
                     default:
                         await Comb8(i);
@@ -251,6 +252,7 @@ public class GamePole : MonoBehaviour
                 await Task.Delay(10);
                 return;
             }
+            StartSpawn = false;
             VorkButton = false;
             FindCombination(i);
             List<Vector2> cordinateCombination = new List<Vector2>();
@@ -261,7 +263,6 @@ public class GamePole : MonoBehaviour
                 {
                     if ((int)blocks[x][y].FrutBlock == i)
                     {
-                        StartSpawn = false;
                         cordinateCombination.Add(new Vector2(x, y));
                         StartCoroutine(blocks[x][y].Fruct.CombinationAnimationAndDisable(blocks[x][y].FrutBlock == Fruts.Бомба));
                         blocksFromDelete.Add(blocks[x][y]);
@@ -286,7 +287,7 @@ public class GamePole : MonoBehaviour
     /// </summary>
     private async Task Comb4(int i)
     {
-        if (typeBlocks[i] > 9)
+        if (typeBlocks[i] > 3)
         {
             _isReset = 0;
             if (isMove)
@@ -314,8 +315,8 @@ public class GamePole : MonoBehaviour
             }
 
             await Task.Delay(1750);
-            Debug.Log("Add 10 free resets");
-            _valueOfFreeResets += 10;
+            Debug.Log($"Add {blocksFromDelete.Count} free resets");
+            _valueOfFreeResets += blocksFromDelete.Count;
 
             for (int x = 0; x < blocksFromDelete.Count; x++)
             {
@@ -409,7 +410,7 @@ public class GamePole : MonoBehaviour
                 }
 
             }*/
-            points += blocks[(int)cordinateCombination[i].x][(int)cordinateCombination[i].y].Cost * (stavka / 100);
+            points += blocks[(int)cordinateCombination[i].x][(int)cordinateCombination[i].y].Cost / 10f;
 
         }
         return points;
@@ -435,6 +436,7 @@ public class GamePole : MonoBehaviour
         {
             for (int y = blocks[x].Count - 1; y >= 0; y--)
             {
+                isMove = true;
 
                 if (!blocks[x][y].gameObject.activeSelf)
                 {
@@ -511,7 +513,7 @@ public class GamePole : MonoBehaviour
             {
                 {
                     StartCoroutine(blocks[x][y].Fruct.Reset());
-                    blocks[x][y].gameObject.transform.position += Vector3.down * 1000 * deltaSize.y;
+                    blocks[x][y].gameObject.transform.position += Vector3.down * 2000 * deltaSize.y;
                     blocks[x][y].gameObject.SetActive(false);
                     blocks[x].Remove(blocks[x][y]);
                 }
